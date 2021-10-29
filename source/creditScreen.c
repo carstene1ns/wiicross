@@ -1,6 +1,6 @@
-#include "../include/wiicross.h"
-#include "../include/graphics.h"
-#include "../include/creditScreen.h"
+#include "wiicross.h"
+#include "graphics.h"
+#include "creditScreen.h"
 
 bool exitCS;
 

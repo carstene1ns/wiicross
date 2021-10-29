@@ -1,5 +1,5 @@
-#include "../include/wiicross.h"
-#include "../include/storage.h"
+#include "wiicross.h"
+#include "storage.h"
 
 extern s_level leveldata[NUMLEVELS];
 extern s_option options;

@@ -1,6 +1,6 @@
-#include "../include/wiicross.h"
-#include "../include/libscognito.h"
-#include "../include/levels.h"
+#include "wiicross.h"
+#include "libscognito.h"
+#include "levels.h"
 
 s_game game;
 s_option options;
@@ -29,6 +29,8 @@ extern int oy;
 int ssc = 0;
 char sscc[10];
 
+WPADData *wpads[4];
+
 int main() {
 	
 	initWii();
@@ -42,13 +44,6 @@ int main() {
 	splashScreen();
 	#endif
 	titleScreen();
-	
-	/*
-	if(systemReset)
-		SYS_ResetSystem(SYS_RETURNTOMENU, 0, 0);
-	else if(systemPowerOff)
-		SYS_ResetSystem(SYS_POWEROFF, 0, 0);
-	*/
 	
 	while(1){
 
@@ -391,7 +386,7 @@ void checkInput(){
 	int buttonsHeld = PAD_ButtonsHeld(0);
 	int buttonsUp = PAD_ButtonsUp(0);
 	int px, py;
-	bool firstMove = false;
+	//bool firstMove = false;
 	
 	px = pointer.x + pointer.w;
 	py = pointer.y + pointer.h;
@@ -483,14 +478,14 @@ void checkInput(){
 	else if( !(buttonsDown & PAD_BUTTON_A) && !(buttonsDown & PAD_BUTTON_B) && options.padType == PAD_NGC){
 		newMove = true;
 		firstState = STATE_NONE;
-		firstMove = false;
+		//firstMove = false;
 	}
 	
 	#ifdef MAKE_WII
 	else if( !(wpads[0]->btns_d & WPAD_BUTTON_A) && !(wpads[0]->btns_d & WPAD_BUTTON_B) && options.padType != PAD_NGC){
 		newMove = true;
 		firstState = STATE_NONE;
-		firstMove = false;
+		//firstMove = false;
 	}
 	#endif
 	

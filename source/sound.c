@@ -1,5 +1,17 @@
-#include "../include/wiicross.h"
+#include "wiicross.h"
 #include "sound.h"
+
+#include "snd_titlescreen_mod.h"
+#include "snd_bg0_mod.h"
+#include "snd_bg1_mod.h"
+#include "snd_levelcleared_ogg.h"
+#include "snd_levelcleared_raw.h"
+#include "snd_click_raw.h"
+#include "snd_error_raw.h"
+#include "snd_bloop_raw.h"
+
+MODPlay mod_track;
+s_song song;
 
 extern s_option options;
 

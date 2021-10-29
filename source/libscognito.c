@@ -1,4 +1,4 @@
-#include "../include/libscognito.h"
+#include "libscognito.h"
 
 GXRModeObj *vmode;
 u32 *xfb[2] = { NULL, NULL };

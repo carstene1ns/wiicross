@@ -6,8 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//#include <mp3player.h>
-#include "snd.h"
+#include <asndlib.h>
 #include <fat.h>
 
 #include "libscognito.h"
@@ -164,8 +163,7 @@ typedef struct{
 	int currentSong;
 } s_song;
 
-WPADData wpaddata[SAMP_BUFS];
-WPADData *wpads[4];
+extern WPADData *wpads[4];
 
 extern s_background splash_sco;
 extern s_background splash_kenney;
@@ -181,7 +179,7 @@ extern MODPlay mod_track;
 
 extern s_game game;
 extern s_theme theme;
-s_song song;
+extern s_song song;
 
 extern char sscc[10];
 extern int ssc;

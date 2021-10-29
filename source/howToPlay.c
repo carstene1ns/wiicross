@@ -1,6 +1,6 @@
-#include "../include/wiicross.h"
-#include "../include/graphics.h"
-#include "../include/howToPlay.h"
+#include "wiicross.h"
+#include "graphics.h"
+#include "howToPlay.h"
 
 bool exitHTP;
 int currentScene;

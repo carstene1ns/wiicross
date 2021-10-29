@@ -1,6 +1,6 @@
-#include "../include/wiicross.h"
-#include "../include/graphics.h"
-#include "../include/pauseScreen.h"
+#include "wiicross.h"
+#include "graphics.h"
+#include "pauseScreen.h"
 
 bool exitPS;
 int cOptionX;

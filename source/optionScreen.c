@@ -1,6 +1,6 @@
-#include "../include/wiicross.h"
-#include "../include/graphics.h"
-#include "../include/optionScreen.h"
+#include "wiicross.h"
+#include "graphics.h"
+#include "optionScreen.h"
 
 bool exitOS;
 
