@@ -3,20 +3,35 @@
 #---------------------------------------------------------------------------------
 .SUFFIXES:
 #---------------------------------------------------------------------------------
+
+# default PLATFORM selection (if not passed via `make PLATFORM=something`)
+PLATFORM := wii
+# check
+ifneq ($(PLATFORM),wii)
+ifneq ($(PLATFORM),gc)
+ifneq ($(PLATFORM),emu)
+$(error "Please pass a valid platform: 'wii', 'gc' or 'emu'")
+endif
+endif
+endif
+
 ifeq ($(strip $(DEVKITPPC)),)
 $(error "Please set DEVKITPPC in your environment. export DEVKITPPC=<path to>devkitPPC")
 endif
 
+ifeq ($(PLATFORM),gc)
+include $(DEVKITPPC)/gamecube_rules
+else
 include $(DEVKITPPC)/wii_rules
-
+endif
 #---------------------------------------------------------------------------------
 # TARGET is the name of the output
 # BUILD is the directory where object files & intermediate files will be placed
 # SOURCES is a list of directories containing source code
 # INCLUDES is a list of directories containing extra header files
 #---------------------------------------------------------------------------------
-TARGET		:=	$(notdir $(CURDIR))
-BUILD		:=	build
+TARGET		:=	WiiCross-$(PLATFORM)
+BUILD		:=	build-$(PLATFORM)
 SOURCES		:=	source
 DATA		:=	data
 INCLUDES	:=	include
@@ -25,7 +40,12 @@ INCLUDES	:=	include
 # options for code generation
 #---------------------------------------------------------------------------------
 
-CFLAGS	= -g -O2 -Wall $(MACHDEP) $(INCLUDE)
+CFLAGS	=	-g -O2 -Wall $(MACHDEP) $(INCLUDE)
+ifeq ($(PLATFORM),wii)
+CFLAGS	+= -DMAKE_WII
+else ifeq ($(PLATFORM),emu)
+CFLAGS	+= -DMAKE_WII -DIS_EMU -O0 -ggdb
+endif
 CXXFLAGS	=	$(CFLAGS)
 
 LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
@@ -33,7 +53,10 @@ LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS	:=	-lfat -lmodplay -lasnd -laesnd -lwiiuse -lbte -logc -lvorbisidec -logg -lpng -lz -lm
+ifneq ($(PLATFORM),gc)
+WIILIBS	:=	-lwiiuse -lbte
+endif
+LIBS	:=	-lfat -lmodplay -laesnd $(WIILIBS) -logc -lvorbisidec -logg -lpng -lz -lm
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
@@ -103,12 +126,17 @@ $(BUILD):
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	@rm -fr $(BUILD) $(OUTPUT).elf $(OUTPUT).dol
+	@rm -fr build-*/ *.elf *.dol
 
 #---------------------------------------------------------------------------------
 run:
+ifeq ($(PLATFORM),wii)
 	wiiload $(TARGET).dol
-
+else ifeq ($(PLATFORM),emu)
+	dolphin-emu -b -e $(TARGET).elf
+else
+	psoload $(TARGET).dol
+endif
 
 #---------------------------------------------------------------------------------
 else
