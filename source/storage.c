@@ -8,7 +8,7 @@ s_level leveldata_tmp[NUMLEVELS]; //HACK FOR FIX BUGGED LEVELS
 
 char error[1000];
 
-void initStorage(){
+void initStorage(bool nocwd){
 	
 	if(!fatInitDefault()){
 		sprintf(error, "failed fat init default: %s", strerror(errno));
@@ -16,14 +16,23 @@ void initStorage(){
 		//breakpoint("failed fat init default ", errno);
 		return;
 	}
+
+	#ifdef MAKE_WII
+	if (nocwd) {
+		// change to default dir, if available
+		struct stat sb;
+		if ((stat("/apps/wiicross", &sb) == 0) && S_ISDIR(sb.st_mode))
+			chdir("/apps/wiicross");
+	}
+	#endif
 	
-	DIR_ITER* dir = diropen(DIR_ROOT "res/"); 
+	DIR* dir = opendir(DIR_ROOT "res/"); 
 	if (dir == NULL) {
-		mkdir(DIR_ROOT "res", S_ISVTX);
+		mkdir(DIR_ROOT "res", 0777);
 			//breakpoint("can't create res directory", errno);
 	}
 	else
-		dirclose(dir);
+		closedir(dir);
 	
 	if(!readSD(FILE_LEVELS))
 		writeSD(FILE_LEVELS);
@@ -66,8 +75,6 @@ int writeSD(int file){
 }
 
 int readSD(int file){
-
-	//return  -1;
 
 	FILE *fp = NULL;
 	
@@ -116,17 +123,17 @@ int readThemesDir(){
 	bool lCompleteFound = false;
 	bool titleFound = false;
 	
-	struct stat st;
-	char filename[MAXPATHLEN];
 	char dirname[MAXPATHLEN];
-	
+
 	char temp[1000];
 	int spriteError = 0;
 	
-	DIR_ITER* dir;
-	DIR_ITER* themeDir;
+	DIR* dir;
+	DIR* themeDir;
+	struct dirent* st;
+	struct dirent* st2;
 
-	dir = diropen (DIR_ROOT "res/themes");
+	dir = opendir(DIR_ROOT "res/themes");
 	
 	int themeCounter = 0;
 	sprintf(theme.themesArray[themeCounter], "default");
@@ -144,19 +151,19 @@ int readThemesDir(){
 	
 	if(dir == NULL) {
 		//breakpoint("Unable to generic theme the directory.", errno);
-		dirclose(dir);
+		closedir(dir);
 		return themeCounter;
 		//return -1;
 	}
 	
-	while (dirnext(dir, temp, &st) == 0){
-		
+	while((st = readdir(dir)) != NULL) {
+ 		
 		// is it a directory and it is not . nor ..?
-		if((strlen(temp)>2) && (st.st_mode & S_IFDIR)){
-					
+		if((strlen(st->d_name)>2) && (st->d_type == DT_DIR)) {
+			
 			// we found first (supposed) theme dir
-			sprintf(dirname, DIR_ROOT "res/themes/%s", temp);
-			themeDir = diropen (dirname);
+			sprintf(dirname, DIR_ROOT "res/themes/%s", st->d_name);
+			themeDir = opendir(dirname);
 			
 			if(themeDir == NULL){
 				//breakpoint("Unable to open the THEME directory.\n", errno);
@@ -170,27 +177,27 @@ int readThemesDir(){
 			titleFound = false;
 			
 			// we are IN the first (supposed) theme dir
-			while (dirnext(themeDir, filename, &st) == 0){
-								
-				if((strlen(filename)>2) && (st.st_mode == 33206)){
+			while((st2 = readdir(themeDir)) != NULL) {
+ 				
+				if((strlen(st2->d_name)>2) && (st2->d_type == DT_REG)) {
 
-					if(strcasecmp(filename, "bg.png") == 0){
+					if(strcasecmp(st2->d_name, "bg.png") == 0){
 						bgFound = true;
 					}
 						
-					if(strcasecmp(filename, "marked.png") == 0){
+					if(strcasecmp(st2->d_name, "marked.png") == 0){
 						markedFound = true;
 					}
 						
-					if(strcasecmp(filename, "filled.png") == 0){
+					if(strcasecmp(st2->d_name, "filled.png") == 0){
 						filledFound = true;
 					}
 					
-					if(strcasecmp(filename, "levelcomplete.png") == 0){
+					if(strcasecmp(st2->d_name, "levelcomplete.png") == 0){
 						lCompleteFound = true;
 					}
 					
-					if(strcasecmp(filename, "title.png") == 0){
+					if(strcasecmp(st2->d_name, "title.png") == 0){
 						titleFound = true;
 					}
 				}
@@ -198,8 +205,8 @@ int readThemesDir(){
 			
 			//0 false, 1 true		
 			if(bgFound & markedFound & filledFound & lCompleteFound & titleFound){
-				if(themeCounter < 255){		
-					sprintf(theme.themesArray[themeCounter], temp);
+				if(themeCounter < 255){
+					sprintf(theme.themesArray[themeCounter], st->d_name);
 					sprintf(temp, DIR_ROOT "res/themes/%s/title.png", theme.themesArray[themeCounter]);
 					spriteError = createSprite(&theme.titleArray[themeCounter], NULL, temp, 508, 263, 1, FMT_PNG, true);
 					
@@ -210,11 +217,10 @@ int readThemesDir(){
 				}
 			}
 			
-			dirclose(themeDir);
+			closedir(themeDir);
 		}
 	}
 	
-	dirclose(dir);
+	closedir(dir);
 	return themeCounter;
 }
-

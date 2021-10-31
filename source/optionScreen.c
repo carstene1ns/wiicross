@@ -335,15 +335,12 @@ void applyChanges(){
 	//audio
 	options.musicType = musictype.frame;
 	
-	if(exitTS){
-		if(options.musicType != oldMusicType){
-			if(options.musicType == MUSIC_OFF)
-				SND_StopVoice(0);
-			else if(options.musicType == MUSIC_ON && oldMusicType != MUSIC_ON)
-				playDefaultLevelMusic();
-			else if(options.musicType == MUSIC_CUSTOM && oldMusicType != MUSIC_CUSTOM)
-				playOggMusic();
-		}
+	if(options.musicType != oldMusicType){
+		stopMusic(oldMusicType);
+		if(options.musicType == MUSIC_ON)
+			playDefaultLevelMusic();
+		else if(options.musicType == MUSIC_CUSTOM)
+			playOggMusic();
 	}
 	
 	#ifndef IS_EMU

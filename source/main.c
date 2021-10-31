@@ -31,12 +31,19 @@ char sscc[10];
 
 WPADData *wpads[4];
 
-int main() {
+int main(int argc, char *argv[]) {
 	
+	// check dolphin/hbc wiiload
+	bool sentByWiiload = false;
+	#ifndef IS_EMU
+	if (argc > 0 && strstr(argv[0], "/") == NULL)
+		sentByWiiload = true;
+	#endif
+
 	initWii();
 	initGfx();
 	initVars();
-	initStorage();
+	initStorage(sentByWiiload);
 	initSound();
 	initThemes();
 	
@@ -77,15 +84,15 @@ int main() {
 			drawScene();
 			updateFrames();
 			updateTime();
-			
+
+			#ifdef MAKE_WII
 			if(options.musicType == MUSIC_CUSTOM && (song.totalSongs > 0)){
 				if(StatusOgg() == OGG_STATUS_ERR){
 					//breakpoint("pas ", OGG_STATUS_PAUSED);
 					playOggMusic();
 				}
 			}
-			
-			#ifdef MAKE_WII
+
 			if(systemReset)
 				SYS_ResetSystem(SYS_RETURNTOMENU, 0, 0);
 			else if(systemPowerOff)
@@ -99,16 +106,6 @@ int main() {
 	return 0;
 }
 
-/*
-void run(){
-	
-	checkInput();
-	drawScene();
-	updateFrames();
-	updateTime();
-	checkLevelFinished();
-}
-*/
 void parseLevel(int level){
 	
 	int i, j, z=0;
@@ -243,8 +240,6 @@ void startNewLevel(int level){
 		playDefaultLevelMusic();
 	else if(options.musicType == MUSIC_CUSTOM)
 		playOggMusic();
-	else
-		SND_StopVoice(0);
 		
 	#ifndef IS_EMU
 		helpNeeded(level);
@@ -764,10 +759,8 @@ bool checkLevelFinishedModeFree(){
 
 void performLevelComplete(){
 	
-	if(options.musicType == MUSIC_ON)
-		SND_StopVoice(0);
-	else if(options.musicType == MUSIC_CUSTOM)
-		StopOgg();
+	if(options.musicType != MUSIC_OFF)
+		stopMusic(options.musicType);
 	
 	if(leveldata[currentLevel].played == false){
 	

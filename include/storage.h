@@ -3,8 +3,9 @@
 
 #include <unistd.h>
 #include <sys/dir.h>
+#include <sys/param.h>
 
-void initStorage();
+void initStorage(bool nocwd);
 int readSD(int file);
 int writeSD(int file);
 void saveCurrentLevel();

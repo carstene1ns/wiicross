@@ -150,9 +150,11 @@ void checkInputPS(){
 		else if(cOptionX == 0 && cOptionY ==1){
 			backToMenu = true;
 			exitPS = true;
+			#ifdef MAKE_WII
 			if(options.musicType == MUSIC_CUSTOM){
 				StopOgg();
 			}
+			#endif
 			sleepMSeconds(30);
 		}
 	}
@@ -172,7 +174,9 @@ int askSaveGame(){
 	bool exit = false;
 	int cursorX = 0;
 	int cursorY = 0;
+	#ifdef MAKE_WII
 	int px, py;
+	#endif
 	int selection = 0;
 	
 	button_yes.x = 138;
@@ -233,9 +237,10 @@ int askSaveGame(){
 		}
 		
 		else if(phase == 3){
-			
+			#ifdef MAKE_WII
 			px = cursor_hand.x;
 			py = cursor_hand.y;
+			#endif
 			
 			PAD_ScanPads();
 			buttonsDown = PAD_ButtonsDown(0);

@@ -52,7 +52,9 @@ int levelSelect(){
 	int posX = ox;
 	int posY = oy;
 	int level = 0;
+	#ifdef MAKE_WII
 	bool isOT = false; // is the pointer over a level thumbnail?
+	#endif
 	int frames = 0;
 	
 	//int numPages = NUMLEVELS / 9;
@@ -67,7 +69,7 @@ int levelSelect(){
 		numPages = NUMLEVELS / 9;
 	
 	#ifndef IS_EMU
-	if(SND_StatusVoice(0) == SND_UNUSED) 
+	if(!checkMusicPlaying() && options.musicType == MUSIC_ON)
 		playTitleScreenMusic();
 	#endif
 	
@@ -165,7 +167,9 @@ int levelSelect(){
 			//556 42
 		// input
 		updateWiimote();
+		#ifdef MAKE_WII
 		isOT = moveCursorPointer(&posX, &posY);
+		#endif
 		PAD_ScanPads();
 		buttonsDown = PAD_ButtonsDown(0);
 		
@@ -353,8 +357,6 @@ int levelSelect(){
 	}
 	
 	//fade(0);
-	
-	//SND_Pause(1);
 	
 	playBloop();
 	sleepMSeconds(10);

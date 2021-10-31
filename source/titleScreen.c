@@ -19,8 +19,8 @@ void titleScreen(){
 	modeplayVisible = false;
 	modePlayPosition = 0;
 	
-	playTitleScreenMusic();
-
+	if(options.musicType != MUSIC_OFF)
+		playTitleScreenMusic();
 	
 	// fade
 	

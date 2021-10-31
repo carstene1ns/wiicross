@@ -55,8 +55,9 @@ LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 #---------------------------------------------------------------------------------
 ifneq ($(PLATFORM),gc)
 WIILIBS	:=	-lwiiuse -lbte
+OGGLIBS :=	-lvorbisidec -logg
 endif
-LIBS	:=	-lfat -lmodplay -laesnd $(WIILIBS) -logc -lvorbisidec -logg -lpng -lz -lm
+LIBS	:=	-lfat -lmodplay -laesnd $(WIILIBS) -logc $(OGGLIBS) -lpng -lz -lm
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
@@ -86,6 +87,12 @@ CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 sFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.S)))
 BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
+
+# remove ogg support
+ifeq ($(PLATFORM),gc)
+CFILES		:=	$(filter-out oggplayer.%,$(CFILES))
+BINFILES	:=	$(filter-out %.ogg,$(BINFILES))
+endif
 
 #---------------------------------------------------------------------------------
 # use CXX for linking C++ projects, CC for standard C
