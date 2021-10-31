@@ -9,6 +9,7 @@ More info : http://frontier-dev.net
 ********************************************************************************************/
 #include <stdio.h>
 #include <malloc.h>
+#include <string.h>
 #include "pngu.h"
 #include "png.h"
 
@@ -834,6 +835,9 @@ void PNGU_YCbYCr_TO_RGB8 (PNGU_u32 ycbycr, PNGU_u8 *r1, PNGU_u8 *g1, PNGU_u8 *b1
 	*b2 = pngu_clamp (val[2] + b, 0, 255);
 }
 
+void user_warning_fn(png_structp png_ptr, png_const_charp warning_msg) {
+	// no-op
+}
 
 int pngu_info (IMGCTX ctx)
 {
@@ -874,7 +878,7 @@ int pngu_info (IMGCTX ctx)
 	}
 
 	// Allocation of libpng structs
-	ctx->png_ptr = png_create_read_struct (PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	ctx->png_ptr = png_create_read_struct (PNG_LIBPNG_VER_STRING, NULL, NULL, user_warning_fn);
     if (!(ctx->png_ptr))
 	{
 		if (ctx->source == PNGU_SOURCE_DEVICE)
